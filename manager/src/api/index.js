@@ -1,5 +1,6 @@
 // 统一请求路径前缀在libs/axios.js中修改
 import {
+    commonUrl,
     getRequest,
     postRequest,
     putRequest,
@@ -10,12 +11,12 @@ import {
     postRequestWithNoForm,
     managerUrl
 } from "@/libs/axios";
-import config from "@/config";
+// import config from "@/config";
 
-let commonUrl =
-    process.env.NODE_ENV === "development" ?
-    config.api_dev.common :
-    config.api_prod.common;
+// let commonUrl =
+//     process.env.NODE_ENV === "development" ?
+//     config.api_dev.common :
+//     config.api_prod.common;
 
 // 文件上传接口
 export const uploadFile = commonUrl + "/common/upload/file";
@@ -43,7 +44,7 @@ export const getNoticePage = params => {
 
 // 登陆
 export const login = params => {
-    return getRequestWithNoToken(`${managerUrl}/user/login`, params);
+    return getRequestWithNoToken(`/user/login`, params);
 };
 // 刷新token
 export const handleRefreshToken = token => {

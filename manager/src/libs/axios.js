@@ -27,6 +27,11 @@ var isRefreshToken = 0;
 const refreshToken = getTokenDebounce();
 service.interceptors.request.use(
     config => {
+        const { baseURL, loading, url } = config;
+        // debugger;
+        if (url.indexOf("/com/") > -1) {
+            config["baseURL"] = "";
+        }
         if (config.method == "get") {
             config.params = {
                 _t: Date.parse(new Date()) / 1000,
