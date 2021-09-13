@@ -1,218 +1,226 @@
 import axios from "axios";
 import config from "@/config";
-import {getStore, setStore} from "./storage.js";
-import {router} from "../router/index";
-import {Message} from "view-design";
+import { getStore, setStore } from "./storage.js";
+import { router } from "../router/index";
+import { Message } from "view-design";
 import Cookies from "js-cookie";
-import {handleRefreshToken} from "../api/index"
+import { handleRefreshToken } from "../api/index";
 
 // 统一请求路径前缀
-export const commonUrl = (process.env.NODE_ENV === 'development' ? config.api_dev.common : config.api_prod.common);
-export const managerUrl = (process.env.NODE_ENV === 'development' ? config.api_dev.manager : config.api_prod.manager) + config.baseUrlPrefix;
+// export const commonUrl =
+//     process.env.NODE_ENV === "development" ?
+//     config.api_dev.common :
+//     config.api_prod.common;
+// export const managerUrl = (process.env.NODE_ENV === 'development' ? config.api_dev.manager : config.api_prod.manager) + config.baseUrlPrefix;
+export const commonUrl =
+    process.env.NODE_ENV === "development" ? "/com" : config.api_prod.common;
+export const managerUrl =
+    (process.env.NODE_ENV === "development" ?
+        "/trade" :
+        config.api_prod.manager) + config.baseUrlPrefix;
 
 const service = axios.create({
-  timeout: 8000,
-  baseURL: managerUrl
-})
+    timeout: 8000,
+    baseURL: managerUrl
+});
 var isRefreshToken = 0;
-const refreshToken = getTokenDebounce()
+const refreshToken = getTokenDebounce();
 service.interceptors.request.use(
-  config => {
-    if (config.method == 'get') {
-      config.params = {
-        _t: Date.parse(new Date()) / 1000,
-        ...config.params
-      }
+    config => {
+        if (config.method == "get") {
+            config.params = {
+                _t: Date.parse(new Date()) / 1000,
+                ...config.params
+            };
+        }
+        const uuid = getStore("uuid");
+        config.headers["uuid"] = uuid;
+        return config;
+    },
+    err => {
+        Message.error("请求超时");
+        return Promise.reject(err);
     }
-    const uuid = getStore('uuid');
-    config.headers['uuid'] = uuid;
-    return config;
-  },
-  err => {
-    Message.error("请求超时");
-    return Promise.reject(err);
-  }
 );
 
 // http response 拦截器
 service.interceptors.response.use(
-  (response) => {
-    const data = response.data;
-    // 根据返回的code值来做不同的处理(和后端约定)
-    if (!data.success && data.message) {
-      Message.error(data.message);
-    }
-    switch (data.code) {
-      case 400:
-        if (data.message !== null) {
-          Message.error(data.message);
-        } else {
-          Message.error("系统异常");
-        }
-        break;
-      case 401:
-        // 未登录 清除已登录状态
-        Cookies.set("userInfoManager", "");
-        setStore("accessToken", "");
-        if (router.history.current.name != "login") {
-          if (data.message !== null) {
+    response => {
+        const data = response.data;
+        // 根据返回的code值来做不同的处理(和后端约定)
+        if (!data.success && data.message) {
             Message.error(data.message);
-          } else {
-            Message.error("未知错误，请重新登录");
-          }
-          router.push("/login");
         }
-        return data;
-        break;
-      case 500:
-        // 系统异常
-        if (data.message !== null) {
-          Message.error(data.message);
-        } else {
-          Message.error("系统异常");
+        switch (data.code) {
+            case 400:
+                if (data.message !== null) {
+                    Message.error(data.message);
+                } else {
+                    Message.error("系统异常");
+                }
+                break;
+            case 401:
+                // 未登录 清除已登录状态
+                Cookies.set("userInfoManager", "");
+                setStore("accessToken", "");
+                if (router.history.current.name != "login") {
+                    if (data.message !== null) {
+                        Message.error(data.message);
+                    } else {
+                        Message.error("未知错误，请重新登录");
+                    }
+                    router.push("/login");
+                }
+                return data;
+                break;
+            case 500:
+                // 系统异常
+                if (data.message !== null) {
+                    Message.error(data.message);
+                } else {
+                    Message.error("系统异常");
+                }
+                break;
+            default:
+                return data;
         }
-        break;
-      default:
-        return data;
-    }
-  },
-  async (error) => {
-    // 返回状态码不为200时候的错误处理
-    if (error.response) {
-      if (error.response.status === 401) {
-        // 这种情况一般调到登录页
-      } else if (error.response.status === 404) {
-        // 避免刷新token报错
-      } else if (error.response.status === 403) {
-        isRefreshToken++;
-        if(isRefreshToken === 1) {
-          const getTokenRes = await refreshToken();
-          if (getTokenRes === 'success') { // 刷新token
-            if (isRefreshToken === 1) {
-              error.response.config.headers.accessToken = getStore('accessToken')
-              return service(error.response.config)
+    },
+    async error => {
+        // 返回状态码不为200时候的错误处理
+        if (error.response) {
+            if (error.response.status === 401) {
+                // 这种情况一般调到登录页
+            } else if (error.response.status === 404) {
+                // 避免刷新token报错
+            } else if (error.response.status === 403) {
+                isRefreshToken++;
+                if (isRefreshToken === 1) {
+                    const getTokenRes = await refreshToken();
+                    if (getTokenRes === "success") {
+                        // 刷新token
+                        if (isRefreshToken === 1) {
+                            error.response.config.headers.accessToken = getStore(
+                                "accessToken"
+                            );
+                            return service(error.response.config);
+                        } else {
+                            router.go(0);
+                        }
+                    } else {
+                        Cookies.set("userInfoManager", "");
+                        router.push("/login");
+                    }
+                    isRefreshToken = 0;
+                }
             } else {
-              router.go(0)
+                // 其他错误处理
+                console.log(error.response.data);
+                Message.error(error.response.data.message);
             }
-          } else {
-            Cookies.set("userInfoManager", "");
-            router.push('/login')
-          }
-          isRefreshToken = 0
         }
-
-      } else {
-        // 其他错误处理
-        console.log(error.response.data);
-        Message.error(error.response.data.message)
-      }
+        /* router.push("/login") */
+        return Promise.resolve(error);
     }
-    /* router.push("/login") */
-    return Promise.resolve(error);
-  }
-)
-
+);
 
 // 防抖闭包来一波
 function getTokenDebounce() {
-  let lock = false
-  let success = false
-  return function () {
-    if (!lock) {
-      lock = true
-      let oldRefreshToken = getStore("refreshToken");
-      handleRefreshToken(oldRefreshToken).then(res => {
-        if (res.success) {
-          let {
-            accessToken,
-            refreshToken
-          } = res.result;
-          setStore("accessToken", accessToken);
-          setStore("refreshToken", refreshToken);
-
-          success = true
-          lock = false
-        } else {
-          success = false
-          lock = false
-          router.push('/login')
-        }
-      }).catch((err) => {
-        success = false
-        lock = false
-      })
-    }
-    return new Promise(resolve => {
-      // 一直看lock,直到请求失败或者成功
-      const timer = setInterval(() => {
+    let lock = false;
+    let success = false;
+    return function() {
         if (!lock) {
-          clearInterval(timer)
-          if (success) {
-            resolve('success')
-          } else {
-            resolve('fail')
-          }
+            lock = true;
+            let oldRefreshToken = getStore("refreshToken");
+            handleRefreshToken(oldRefreshToken)
+                .then(res => {
+                    if (res.success) {
+                        let { accessToken, refreshToken } = res.result;
+                        setStore("accessToken", accessToken);
+                        setStore("refreshToken", refreshToken);
+
+                        success = true;
+                        lock = false;
+                    } else {
+                        success = false;
+                        lock = false;
+                        router.push("/login");
+                    }
+                })
+                .catch(err => {
+                    success = false;
+                    lock = false;
+                });
         }
-      }, 500) // 轮询时间间隔
-    })
-  }
+        return new Promise(resolve => {
+            // 一直看lock,直到请求失败或者成功
+            const timer = setInterval(() => {
+                if (!lock) {
+                    clearInterval(timer);
+                    if (success) {
+                        resolve("success");
+                    } else {
+                        resolve("fail");
+                    }
+                }
+            }, 500); // 轮询时间间隔
+        });
+    };
 }
 
-
 export const getRequest = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "get",
-    url: `${url}`,
-    params: params,
-    headers: {
-      accessToken: accessToken
-    }
-  });
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "get",
+        url: `${url}`,
+        params: params,
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 export const postRequest = (url, params, headers) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "post",
-    url: `${url}`,
-    data: params,
-    transformRequest: headers
-      ? undefined
-      : [
-        function (data) {
-          let ret = "";
-          for (let it in data) {
-            ret +=
-              encodeURIComponent(it) +
-              "=" +
-              encodeURIComponent(data[it]) +
-              "&";
-          }
-          ret = ret.substring(0, ret.length - 1);
-          return ret;
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "post",
+        url: `${url}`,
+        data: params,
+        transformRequest: headers ?
+            undefined :
+            [
+                function(data) {
+                    let ret = "";
+                    for (let it in data) {
+                        ret +=
+                            encodeURIComponent(it) +
+                            "=" +
+                            encodeURIComponent(data[it]) +
+                            "&";
+                    }
+                    ret = ret.substring(0, ret.length - 1);
+                    return ret;
+                }
+            ],
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            accessToken: accessToken,
+            ...headers
         }
-      ],
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      accessToken: accessToken,
-      ...headers
-    }
-  });
+    });
 };
 
 /** 不带form表单不带transformRequest */
 export const postRequestWithNoForm = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "post",
-    url: `${url}`,
-    data: params,
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "post",
+        url: `${url}`,
+        data: params,
 
-    headers: {
-      accessToken: accessToken
-    }
-  });
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 // export const postRequestWithHeaders = (url, params) => {
@@ -230,82 +238,82 @@ export const postRequestWithNoForm = (url, params) => {
 // };
 
 export const putRequest = (url, params, headers) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "put",
-    url: `${url}`,
-    data: params,
-    transformRequest: headers
-      ? undefined
-      : [
-        function (data) {
-          let ret = "";
-          for (let it in data) {
-            ret +=
-              encodeURIComponent(it) +
-              "=" +
-              encodeURIComponent(data[it]) +
-              "&";
-          }
-          ret = ret.substring(0, ret.length - 1);
-          return ret;
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "put",
+        url: `${url}`,
+        data: params,
+        transformRequest: headers ?
+            undefined :
+            [
+                function(data) {
+                    let ret = "";
+                    for (let it in data) {
+                        ret +=
+                            encodeURIComponent(it) +
+                            "=" +
+                            encodeURIComponent(data[it]) +
+                            "&";
+                    }
+                    ret = ret.substring(0, ret.length - 1);
+                    return ret;
+                }
+            ],
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            accessToken: accessToken,
+            ...headers
         }
-      ],
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-      accessToken: accessToken,
-      ...headers
-    }
-  });
+    });
 };
 
 export const putRequestWithNoForm = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "put",
-    url: `${url}`,
-    data: params,
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "put",
+        url: `${url}`,
+        data: params,
 
-    headers: {
-      accessToken: accessToken
-    }
-  });
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 export const deleteRequest = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "delete",
-    url: `${url}`,
-    params: params,
-    headers: {
-      accessToken: accessToken
-    }
-  });
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "delete",
+        url: `${url}`,
+        params: params,
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 export const importRequest = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "post",
-    url: `${url}`,
-    data: params,
-    headers: {
-      accessToken: accessToken
-    }
-  });
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "post",
+        url: `${url}`,
+        data: params,
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 export const uploadFileRequest = (url, params) => {
-  let accessToken = getStore("accessToken");
-  return service({
-    method: "post",
-    url: `${url}`,
-    params: params,
-    headers: {
-      accessToken: accessToken
-    }
-  });
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "post",
+        url: `${url}`,
+        params: params,
+        headers: {
+            accessToken: accessToken
+        }
+    });
 };
 
 /**
@@ -314,13 +322,12 @@ export const uploadFileRequest = (url, params) => {
  * @param {*} params
  */
 export const getRequestWithNoToken = (url, params) => {
-  return service({
-    method: "get",
-    url: `${url}`,
-    params: params
-  });
+    return service({
+        method: "get",
+        url: `${url}`,
+        params: params
+    });
 };
-
 
 /**
  * 无需token验证的请求 避免旧token过期导致请求失败
@@ -328,10 +335,9 @@ export const getRequestWithNoToken = (url, params) => {
  * @param {*} params
  */
 export const postRequestWithNoToken = (url, params) => {
-  return service({
-    method: "post",
-    url: `${url}`,
-    params: params
-  });
+    return service({
+        method: "post",
+        url: `${url}`,
+        params: params
+    });
 };
-
