@@ -3,7 +3,13 @@
   <div class="model-title">
     <div>店铺装修</div>
     <div class="btns">
-      <Button @click="clickBtn(item)" size="small" v-for="(item, index) in way" :key="index" :type="item.selected ? 'primary' : ''">
+      <Button
+        @click="clickBtn(item)"
+        size="small"
+        v-for="(item, index) in way"
+        :key="index"
+        :type="item.selected ? 'primary' : ''"
+      >
         {{ item.title }}
       </Button>
     </div>
@@ -16,9 +22,17 @@
           <div ref="qrCodeUrl"></div>
         </div>
       </Poptip> -->
-      <Button size="default" type="primary" @click="handleSpinShow">保存模板</Button>
+      <Button size="default" type="primary" @click="handleSpinShow"
+        >保存模板</Button
+      >
 
-      <Modal title="保存中" v-model="saveDialog" :closable="true" :mask-closable="false" :footer-hide="true">
+      <Modal
+        title="保存中"
+        v-model="saveDialog"
+        :closable="true"
+        :mask-closable="false"
+        :footer-hide="true"
+      >
         <div v-if="progress">
           <div class="model-item">
             模板名称 <Input style="width: 200px" v-model="submitWay.name" />
@@ -52,8 +66,8 @@ export default {
         {
           title: "首页",
           name: "index",
-          selected: true,
-        },
+          selected: true
+        }
         // {
         //   title: "全屏广告",
         //   name: "advertising",
@@ -65,13 +79,13 @@ export default {
         //   selected: false,
         // },
       ],
-   
+
       submitWay: {
         // 表单信息
         pageShow: this.$route.query.type || false,
         name: this.$route.query.name || "模板名称",
-        pageClientType: "H5",
-      },
+        pageClientType: "H5"
+      }
     };
   },
   watch: {},
@@ -117,9 +131,9 @@ export default {
         name: this.submitWay.name,
         pageShow: this.submitWay.pageShow,
         pageType: "INDEX",
-        pageClientType: "H5",
+        pageClientType: "H5"
       })
-        .then((res) => {
+        .then(res => {
           this.num = 50;
           if (res.success) {
             this.num = 80;
@@ -135,13 +149,13 @@ export default {
           }
           console.log(res);
         })
-        .catch((error) => {});
+        .catch(error => {});
     },
 
     // 返回查询数据页面
     goback() {
       this.$router.push({
-        path: "/wapList",
+        path: "/wapList"
       });
     },
 
@@ -149,7 +163,7 @@ export default {
     submit(submitWay) {
       this.progress = false;
       API_Other.setHomeSetup(submitWay)
-        .then((res) => {
+        .then(res => {
           this.num = 50;
           if (res.success) {
             this.num = 80;
@@ -166,9 +180,9 @@ export default {
           }
           console.log(res);
         })
-        .catch((error) => {});
-    },
-  },
+        .catch(error => {});
+    }
+  }
 };
 </script>
 <style scoped lang="scss">

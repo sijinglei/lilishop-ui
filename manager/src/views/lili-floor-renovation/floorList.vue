@@ -1,8 +1,13 @@
 <template>
   <div class="wrapper">
     <Card class="category">
-      <div :class="{active:i == selectedIndex}" class="category-item" v-for="(typeItem,i) in pageTypes" :key="typeItem.type">
-        <div @click="clickType(typeItem.type,i)">{{typeItem.title}}</div>
+      <div
+        :class="{ active: i == selectedIndex }"
+        class="category-item"
+        v-for="(typeItem, i) in pageTypes"
+        :key="typeItem.type"
+      >
+        <div @click="clickType(typeItem.type, i)">{{ typeItem.title }}</div>
       </div>
     </Card>
     <Card class="content">
@@ -20,20 +25,34 @@
         <div class="item" v-for="(item, index) in list" :key="index">
           <div>{{ item.name || "暂无模板昵称" }}</div>
           <div class="item-config">
-            <i-switch v-model="item.pageShow" @on-change="releaseTemplate(item.id)">
+            <i-switch
+              v-model="item.pageShow"
+              @on-change="releaseTemplate(item.id)"
+            >
               <span slot="open">开</span>
               <span slot="close">关</span>
             </i-switch>
-            <Button type="info" placement="right" @click="Template(item)" size="small">编辑</Button>
-            <Button type="success" placement="right" @click="decorate(item)" size="small">装修</Button>
+            <Button
+              type="info"
+              placement="right"
+              @click="Template(item)"
+              size="small"
+              >编辑</Button
+            >
+            <Button
+              type="success"
+              placement="right"
+              @click="decorate(item)"
+              size="small"
+              >装修</Button
+            >
             <Poptip confirm title="删除此模板？" @on-ok="delTemplate(item.id)">
               <Button type="error" size="small">删除</Button>
             </Poptip>
           </div>
         </div>
-        <div class="no-more" v-if="list.length ==0">暂无更多模板</div>
+        <div class="no-more" v-if="list.length == 0">暂无更多模板</div>
       </div>
-
     </Card>
     <Modal
       v-model="showModal"
@@ -61,38 +80,41 @@ export default {
   name: "floorList",
   data() {
     return {
-      showModal: false,  // 添加modal的显示
+      showModal: false, // 添加modal的显示
       selectedIndex: 0, // 首页还是专题选择的index
-      formData: { // 新建模态框的数据
+      formData: {
+        // 新建模态框的数据
         status: false, // 模板是否开启
-        name: "", // 模板名称
+        name: "" // 模板名称
       },
-      columns: [ // 列表展示的column
+      columns: [
+        // 列表展示的column
         {
           title: "页面名称",
-          key: "name",
+          key: "name"
         },
         {
-          title: "状态",
+          title: "状态"
         },
         {
           title: "操作",
-          key: "action",
-        },
+          key: "action"
+        }
       ],
 
       loading: false, // 加载状态
-      pageTypes: [ // 那种类别的模板
+      pageTypes: [
+        // 那种类别的模板
         {
           type: "INDEX",
-          title: "首页",
+          title: "首页"
         }
         // {
         //   type: "SPECIAL",
         //   title: "专题",
         // },
       ],
-      list: [], // 模板列表
+      list: [] // 模板列表
     };
   },
   mounted() {
@@ -101,20 +123,20 @@ export default {
   methods: {
     newTemplate() {
       // 添加，编辑模板
-      this.$refs.form.validate((valid) => {
+      this.$refs.form.validate(valid => {
         if (valid) {
           const data = this.formData;
           data.status ? (data.pageShow = "OPEN") : (data.pageShow = "CLOSE");
           delete data.status;
           (data.pageType = "INDEX"), (data.pageClientType = "PC");
           if (data.id) {
-            API_floor.updateHome(data.id, data).then((res) => {
+            API_floor.updateHome(data.id, data).then(res => {
               this.$Message.success("编辑模板成功");
               this.showModal = false;
               this.getTemplateList();
             });
           } else {
-            API_floor.setHomeSetup(data).then((res) => {
+            API_floor.setHomeSetup(data).then(res => {
               this.$Message.success("新建模板成功");
               this.showModal = false;
               this.getTemplateList();
@@ -134,14 +156,17 @@ export default {
 
     Template(item) {
       // 编辑表单
-      item.status = item.pageShow
+      item.status = item.pageShow;
       this.formData = item;
       this.showModal = true;
     },
 
     decorate(val) {
       // 装修
-      this.$router.push({ name: "renovation", query: { id: val.id,pageShow:val.pageShow } });
+      this.$router.push({
+        name: "renovation",
+        query: { id: val.id, pageShow: val.pageShow }
+      });
     },
 
     getTemplateList() {
@@ -150,25 +175,25 @@ export default {
         pageNumber: 1,
         pageSize: 999,
         pageType: "INDEX",
-        pageClientType: "PC",
+        pageClientType: "PC"
       };
-      API_floor.getHomeList(params).then((res) => {
+      API_floor.getHomeList(params).then(res => {
         if (res.success) {
           this.list = res.result.records;
           this.list.forEach(e => {
-            if (e.pageShow === 'OPEN') {
-              e.pageShow = true
+            if (e.pageShow === "OPEN") {
+              e.pageShow = true;
             } else {
-              e.pageShow = false
+              e.pageShow = false;
             }
-          })
+          });
         }
       });
     },
 
     releaseTemplate(id) {
       //发布模板
-      API_floor.releasePageHome(id).then((res) => {
+      API_floor.releasePageHome(id).then(res => {
         if (res.success) {
           this.$Message.success("发布模板成功");
           this.getTemplateList();
@@ -177,13 +202,13 @@ export default {
     },
     // 删除模板
     delTemplate(id) {
-      API_floor.removePageHome(id).then((res) => {
+      API_floor.removePageHome(id).then(res => {
         if (res.success) {
           this.$Message.success("删除模板成功");
           this.getTemplateList();
         }
       });
-    },
+    }
   }
 };
 </script>
@@ -197,7 +222,7 @@ export default {
   background: #ededed;
 }
 .item-title {
-  background: #d7e7f5!important;
+  background: #d7e7f5 !important;
   height: 54px;
 }
 .no-more {
@@ -239,12 +264,12 @@ export default {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    div:nth-child(2){
+    div:nth-child(2) {
       margin-right: 80px;
     }
   }
 }
-.item:nth-of-type(2n+1) {
+.item:nth-of-type(2n + 1) {
   background: #f5f7fa;
 }
 </style>

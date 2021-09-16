@@ -214,6 +214,36 @@ export const postRequest = (url, params, headers) => {
     });
 };
 
+export const postRequestAdd = (url, params, headers) => {
+    let accessToken = getStore("accessToken");
+    return service({
+        method: "post",
+        url: `${url}`,
+        data: params,
+        // transformRequest: headers ?
+        //     undefined :
+        //     [
+        //         function(data) {
+        //             let ret = "";
+        //             for (let it in data) {
+        //                 ret +=
+        //                     encodeURIComponent(it) +
+        //                     "=" +
+        //                     encodeURIComponent(data[it]) +
+        //                     "&";
+        //             }
+        //             ret = ret.substring(0, ret.length - 1);
+        //             return ret;
+        //         }
+        //     ],
+        headers: {
+            "Content-Type": " application/json; charset=utf-8",
+            accessToken: accessToken,
+            ...headers
+        }
+    });
+};
+
 /** 不带form表单不带transformRequest */
 export const postRequestWithNoForm = (url, params) => {
     let accessToken = getStore("accessToken");
