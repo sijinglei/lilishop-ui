@@ -19,20 +19,20 @@ export default {
      * @description api请求基础路径
      */
     api_dev: {
-        // common: "https://common-api.pickmall.cn",
-        // buyer: "https://buyer-api.pickmall.cn",
-        // seller: "https://store-api.pickmall.cn",
-        // manager: "https://admin-api.pickmall.cn",
+        // common: "https://common-api.tjmarket.ca",
+        // buyer: "https://buyer-api.tjmarket.ca",
+        // seller: "https://store-api.tjmarket.ca",
+        // manager: "https://admin-api.tjmarket.ca",
         common: "/com", //http://192.168.0.131:8890
         buyer: "/buy", //http://192.168.0.131:8888
         seller: "/sell", //http://192.168.0.131:8889
         manager: "/trade" //http://192.168.0.131:8887
     },
     api_prod: {
-        common: "https://common-api.pickmall.cn",
-        buyer: "https://buyer-api.pickmall.cn",
-        seller: "https://store-api.pickmall.cn",
-        manager: "https://admin-api.pickmall.cn"
+        common: "http://common-api.tjmarket.ca",
+        buyer: "http://buyer-api.tjmarket.ca",
+        seller: "http://store-api.tjmarket.ca",
+        manager: "http://admin-api.tjmarket.ca"
     },
     /**
      *  @description api请求基础路径前缀

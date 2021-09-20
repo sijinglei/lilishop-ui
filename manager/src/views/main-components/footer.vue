@@ -1,29 +1,33 @@
 <template>
   <div class="foot">
     <Row type="flex" justify="space-around" class="help">
-      <a class="item" href="https://pickmall.com" target="_blank">{{ $t('help') }}</a>
-      <a class="item" href="https://pickmall.com" target="_blank">{{ $t('privacy') }}</a>
-      <a class="item" href="https://pickmall.com" target="_blank">{{ $t('terms') }}</a>
+      <a class="item" href="https://pickmall.com" target="_blank">{{
+        $t("help")
+      }}</a>
+      <a class="item" href="https://pickmall.com" target="_blank">{{
+        $t("privacy")
+      }}</a>
+      <a class="item" href="https://pickmall.com" target="_blank">{{
+        $t("terms")
+      }}</a>
     </Row>
     <Row type="flex" justify="center" class="copyright">
-      Copyright © {{year}} - Present
-      <a
-        href="https://pickmall.cn/"
-        target="_blank"
-        style="margin:0 5px;"
-      >lili-shop</a> {{ $t('rights') }}
+      Copyright © {{ year }} - Present
+      <a href="https://tjmarket.ca/" target="_blank" style="margin:0 5px;"
+        >lili-shop</a
+      >
+      {{ $t("rights") }}
     </Row>
   </div>
 </template>
 
 <script>
 export default {
-
   data() {
     return {
       year: new Date().getFullYear()
-    }
-  },
+    };
+  }
 };
 </script>
 

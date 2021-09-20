@@ -49,8 +49,8 @@ Vue.prototype.setStore = setStore;
 Vue.prototype.getStore = getStore;
 Vue.prototype.removeStore = removeStore;
 Vue.prototype.md5 = md5;
-const buyerUrlPC = "http://localhost:10000"; // "https://pc-b2b2c.pickmall.cn"; // 跳转买家端地址 pc端
-const buyerUrlWap = "https://m-b2b2c.pickmall.cn"; // 跳转买家端地址 wap端
+const buyerUrlPC = "http://pc.tjmarket.ca"; // "https://"; // 跳转买家端地址 pc端
+const buyerUrlWap = "http://m.tjmarket.ca"; // 跳转买家端地址 wap端
 Vue.prototype.linkTo = function(goodsId, skuId) {
     // 跳转买家端商品
     window.open(
