@@ -86,28 +86,28 @@ module.exports = {
         },
         proxy: {
             "/trade": {
-                // target: "http://admin-api.tjmarket.ca", //线上地址
+                // target: "https://admin-api.tjmarket.ca", //线上地址
                 // target: "http://192.168.0.131:8887", // pt
                 target: "http://15.222.2.223:8887", // test
                 changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
                 pathRewrite: { "^/trade": "/" } //这里重写路径
             },
             "/com": {
-                // target: "http://common-api.tjmarket.ca", //线上地址
+                // target: "https://common-api.tjmarket.ca", //线上地址
                 // target: "http://192.168.0.131:8890", // pt
                 target: "http://15.222.2.223:8890", // test
                 changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
                 pathRewrite: { "^/com": "/" } //这里重写路径
             },
             "/sell": {
-                // target: "http://common-api.tjmarket.ca", //线上地址
+                // target: "https://common-api.tjmarket.ca", //线上地址
                 // target: "http://192.168.0.131:8889", // pt
                 target: "http://15.222.2.223:8889", // test
                 changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题
                 pathRewrite: { "^/sell": "/" } //这里重写路径
             },
             "/buy": {
-                // target: "http://common-api.tjmarket.ca", //线上地址
+                // target: "https://common-api.tjmarket.ca", //线上地址
                 // target: "http://192.168.0.131:8888", // pt
                 target: "http://15.222.2.223:8888", // test
                 changeOrigin: true, //开启代理：在本地会创建一个虚拟服务端，然后发送请求的数据，并同时接收请求的数据，这样服务端和服务端进行数据的交互就不会有跨域问题

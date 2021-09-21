@@ -29,10 +29,10 @@ export default {
         manager: "/trade" //http://192.168.0.131:8887
     },
     api_prod: {
-        common: "http://common-api.tjmarket.ca",
-        buyer: "http://buyer-api.tjmarket.ca",
+        common: "https://common-api.tjmarket.ca",
+        buyer: "https://buyer-api.tjmarket.ca",
         seller: "http://store-api.tjmarket.ca",
-        manager: "http://admin-api.tjmarket.ca"
+        manager: "https://admin-api.tjmarket.ca"
     },
     /**
      *  @description api请求基础路径前缀
