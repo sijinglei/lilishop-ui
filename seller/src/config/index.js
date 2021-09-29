@@ -31,7 +31,7 @@ export default {
     api_prod: {
         common: "https://common-api.tjmarket.ca",
         buyer: "https://buyer-api.tjmarket.ca",
-        seller: "http://store-api.tjmarket.ca",
+        seller: "https://store-api.tjmarket.ca",
         manager: "https://admin-api.tjmarket.ca"
     },
     /**
