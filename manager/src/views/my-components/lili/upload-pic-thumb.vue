@@ -3,13 +3,17 @@
     <div class="upload-pic-thumb">
       <vuedraggable
         :list="uploadList"
-        :disabled="!draggable||!multiple"
+        :disabled="!draggable || !multiple"
         :animation="200"
         class="list-group"
         ghost-class="thumb-ghost"
         @end="onEnd"
       >
-        <div class="upload-list" v-for="(item, index) in uploadList" :key="index">
+        <div
+          class="upload-list"
+          v-for="(item, index) in uploadList"
+          :key="index"
+        >
           <div v-if="item.status == 'finished'" style="height:60px;">
             <img :src="item.url" />
             <div class="upload-list-cover">
@@ -18,7 +22,11 @@
             </div>
           </div>
           <div v-else>
-            <Progress v-if="item.showProgress" :percent="item.percentage" hide-info></Progress>
+            <Progress
+              v-if="item.showProgress"
+              :percent="item.percentage"
+              hide-info
+            ></Progress>
           </div>
         </div>
       </vuedraggable>
@@ -28,7 +36,7 @@
         :show-upload-list="false"
         :on-success="handleSuccess"
         :on-error="handleError"
-        :format="['jpg','jpeg','png','gif']"
+        :format="['jpg', 'jpeg', 'png', 'gif']"
         :max-size="1024"
         :on-format-error="handleFormatError"
         :on-exceeded-size="handleMaxSize"
@@ -43,10 +51,19 @@
         </div>
       </Upload>
     </div>
-    <Modal title="图片预览" v-model="viewImage" :styles="{top: '30px'}" draggable>
-      <img :src="imgUrl" alt="无效的图片链接" style="width: 100%;margin: 0 auto;display: block;" />
+    <Modal
+      title="图片预览"
+      v-model="viewImage"
+      :styles="{ top: '30px' }"
+      draggable
+    >
+      <img
+        :src="imgUrl"
+        alt="无效的图片链接"
+        style="width: 100%;margin: 0 auto;display: block;"
+      />
       <div slot="footer">
-        <Button @click="viewImage=false">关闭</Button>
+        <Button @click="viewImage = false">关闭</Button>
       </div>
     </Modal>
   </div>
@@ -95,7 +112,8 @@ export default {
     init() {
       this.setData(this.value, true);
       this.accessToken = {
-        accessToken: this.getStore("accessToken")
+        accessToken: this.getStore("accessToken"),
+        folder: "admin_file"
       };
     },
     // 预览图片
@@ -142,8 +160,7 @@ export default {
     handleMaxSize(file) {
       this.$Notice.warning({
         title: "文件大小过大",
-        desc:
-          "所选文件大小过大，不能超过1M."
+        desc: "所选文件大小过大，不能超过1M."
       });
     },
     // 上传之前钩子
@@ -244,7 +261,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.upload-pic-thumb{
+.upload-pic-thumb {
   display: flex;
 }
 .upload-list {

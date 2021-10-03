@@ -6,7 +6,7 @@
         <div class="e-menu e-code" @click="editHTML">
           <Icon type="md-code-working" size="22" />
         </div>
-        <div class="e-menu e-preview" @click="fullscreenModal=true">
+        <div class="e-menu e-preview" @click="fullscreenModal = true">
           <Icon type="ios-eye" size="24" />
         </div>
         <div class="e-menu e-trash" @click="clear">
@@ -15,18 +15,35 @@
       </div>
     </div>
 
-    <Modal title="编辑html代码" v-model="showHTMLModal" :mask-closable="false" :width="900" :fullscreen="full">
-      <Input v-if="!full" v-model="dataEdit" :rows="15" type="textarea" style="max-height:60vh;overflow:auto;" />
+    <Modal
+      title="编辑html代码"
+      v-model="showHTMLModal"
+      :mask-closable="false"
+      :width="900"
+      :fullscreen="full"
+    >
+      <Input
+        v-if="!full"
+        v-model="dataEdit"
+        :rows="15"
+        type="textarea"
+        style="max-height:60vh;overflow:auto;"
+      />
       <Input v-if="full" v-model="dataEdit" :rows="32" type="textarea" />
       <div slot="footer">
-        <Button @click="full=!full" icon="md-expand">全屏开/关</Button>
-        <Button @click="editHTMLOk" type="primary" icon="md-checkmark-circle-outline">确定保存</Button>
+        <Button @click="full = !full" icon="md-expand">全屏开/关</Button>
+        <Button
+          @click="editHTMLOk"
+          type="primary"
+          icon="md-checkmark-circle-outline"
+          >确定保存</Button
+        >
       </div>
     </Modal>
     <Modal title="预览" v-model="fullscreenModal" fullscreen>
-      <div v-html="data">{{data}}</div>
+      <div v-html="data">{{ data }}</div>
       <div slot="footer">
-        <Button @click="fullscreenModal=false">关闭</Button>
+        <Button @click="fullscreenModal = false">关闭</Button>
       </div>
     </Modal>
   </div>
@@ -44,40 +61,39 @@ export default {
   props: {
     id: {
       type: String,
-      default: "editor",
+      default: "editor"
     },
     value: String,
     base64: {
       type: Boolean,
-      default: false,
+      default: false
     },
     showExpand: {
       type: Boolean,
-      default: true,
+      default: true
     },
     openXss: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
       editor: null, // 富文本编辑器初始化
-      data: '', // 富文本数据
+      data: "", // 富文本数据
       dataEdit: "", // 编辑数据
       showHTMLModal: false, // 显示html
       full: false, // html全屏开关
-      fullscreenModal: false, // 显示全屏预览
+      fullscreenModal: false // 显示全屏预览
     };
   },
   methods: {
-
     initEditor() {
       let that = this;
       // 详见wangeditor3官网文档 https://www.kancloud.cn/wangfupeng/wangeditor3/332599
       editor = new E(`#${this.id}`);
       // 编辑内容绑定数据
-      editor.config.onchange = (html) => {
+      editor.config.onchange = html => {
         if (this.openXss) {
           this.data = xss(html);
         } else {
@@ -98,42 +114,43 @@ export default {
         // lili如要header中传入token鉴权
         editor.config.uploadImgHeaders = {
           accessToken: that.getStore("accessToken"),
+          folder: "admin_file"
         };
         editor.config.uploadFileName = "file";
         editor.config.uploadImgHooks = {
-          before: function (xhr, editor, files) {
+          before: function(xhr, editor, files) {
             // 图片上传之前触发
           },
-          success: function (xhr, editor, result) {
+          success: function(xhr, editor, result) {
             // 图片上传并返回结果，图片插入成功之后触发
           },
-          fail: function (xhr, editor, result) {
+          fail: function(xhr, editor, result) {
             // 图片上传并返回结果，但图片插入错误时触发
             that.$Message.error("上传图片失败");
           },
-          error: function (xhr, editor) {
+          error: function(xhr, editor) {
             // 图片上传出错时触发
             that.$Message.error("上传图片出错");
           },
-          timeout: function (xhr, editor) {
+          timeout: function(xhr, editor) {
             // 图片上传超时时触发
             that.$Message.error("上传图片超时");
           },
           // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
-          customInsert: function (insertImg, result, editor) {
+          customInsert: function(insertImg, result, editor) {
             if (result.success == true) {
-              console.log(insertImg,result,editor);
+              console.log(insertImg, result, editor);
               let url = result.result;
               insertImg(url);
               that.$Message.success("上传图片成功");
             } else {
               that.$Message.error(result.message);
             }
-          },
+          }
         };
       }
 
-      editor.config.customAlert = function (info) {
+      editor.config.customAlert = function(info) {
         // info 是需要提示的内容
         // that.$Message.info(info);
       };
@@ -147,8 +164,8 @@ export default {
           // type -> 'emoji' / 'image'
           type: "image",
           // content -> 数组
-          content: sina,
-        },
+          content: sina
+        }
       ];
       editor.create();
       if (this.value) {
@@ -181,7 +198,7 @@ export default {
           editor.txt.html(this.data);
           this.$emit("input", this.data);
           this.$emit("on-change", this.data);
-        },
+        }
       });
     },
     // 回显数据
@@ -193,16 +210,16 @@ export default {
       editor.txt.html(this.data);
       this.$emit("input", this.data);
       this.$emit("on-change", this.data);
-    },
+    }
   },
   watch: {
     value(val) {
       this.setData(val);
-    },
+    }
   },
   mounted() {
     this.initEditor();
-  },
+  }
 };
 </script>
 
@@ -229,4 +246,3 @@ export default {
   left: 215px;
 }
 </style>
-
