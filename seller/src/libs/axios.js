@@ -17,6 +17,7 @@ export const commonUrl =
     config.api_prod.common;
 // 文件上传接口
 export const uploadFile = commonUrl + "/common/upload/file";
+export const filePre = "https://tjmarket001.s3-accelerate.amazonaws.com/";
 var isRefreshToken = 0;
 const refreshToken = getTokenDebounce();
 const service = axios.create({

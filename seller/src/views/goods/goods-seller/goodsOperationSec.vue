@@ -137,7 +137,7 @@
                     :key="__index"
                   >
                     <template>
-                      <img :src="baseUrl + item.url" />
+                      <img :src="item.url" />
                       <div class="demo-upload-list-cover">
                         <div>
                           <Icon
@@ -567,7 +567,7 @@ import * as API_Shop from "@/api/shops";
 import cloneObj from "@/utils/index";
 import vuedraggable from "vuedraggable";
 import editor from "@/views/my-components/lili/editor";
-import { uploadFile } from "@/libs/axios";
+import { uploadFile, filePre } from "@/libs/axios";
 import { regular } from "@/utils";
 
 export default {
@@ -620,6 +620,7 @@ export default {
       }
     };
     return {
+      filePre,
       accessToken: "", //令牌token
       goodsParams: "",
       categoryId: "", // 商品分类第三级id
@@ -747,8 +748,7 @@ export default {
         "quantity",
         "specId",
         "specValueId"
-      ],
-      baseUrl: window.config.domain
+      ]
     };
   },
   methods: {
@@ -1469,7 +1469,8 @@ export default {
   },
   mounted() {
     this.accessToken = {
-      accessToken: this.getStore("accessToken")
+      accessToken: this.getStore("accessToken"),
+      folder: "p_file"
     };
     // 获取物流模板
     API_Shop.getShipTemplate().then(res => {
